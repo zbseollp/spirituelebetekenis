@@ -17,10 +17,9 @@ const recent = allPosts.slice(0, 10);
 >
   <div class="wrap layout">
     <div>
-      <h1>{home?.data.title || site.name}</h1>
       {home?.data.content && <div class="entry__content" set:html={home.data.content} />}
 
-      <h2>Onderwerpen</h2>
+      <div class="block-head"><h2>Onderwerpen</h2></div>
       <div class="cat-grid">
         {categories.map((c) => (
           <a class="cat-card" href={`/info/${c.slug}/`}>
@@ -30,9 +29,12 @@ const recent = allPosts.slice(0, 10);
         ))}
       </div>
 
-      <h2 style="margin-top:2.5rem">Recente artikelen</h2>
+      <div class="block-head">
+        <h2>Recente artikelen</h2>
+        <a href="/blog/">Alle berichten</a>
+      </div>
       <ArchiveList posts={recent} />
-      <p style="margin-top:1.5rem"><a class="button" href="/blog/">Alle berichten bekijken</a></p>
+      <p style="margin-top:1.75rem"><a class="button" href="/blog/">Alle berichten bekijken</a></p>
     </div>
     <Sidebar />
   </div>

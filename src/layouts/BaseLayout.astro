@@ -44,6 +44,13 @@ const path = Astro.url.pathname;
     <meta property="og:image" content={ogImage} />
     <meta property="og:locale" content="nl_NL" />
     <meta name="twitter:card" content="summary_large_image" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Lora:wght@500;600&display=swap"
+    />
     <link rel="alternate" type="application/rss+xml" title={site.name} href="/feed/" />
     <slot name="head" />
   </head>

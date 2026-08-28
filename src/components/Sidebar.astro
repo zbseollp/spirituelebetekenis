@@ -4,19 +4,25 @@ import { allPosts, categories, postsInCategory } from "../lib/index";
 
 // Dezelfde zijbalk als de oude site: eerst de promotieblokken, dan de
 // recente artikelen en de categorieën.
-const recent = allPosts.slice(0, 10);
+const recent = allPosts.slice(0, 8);
 const external = (href: string) => Boolean(affiliateRedirects[href]);
 ---
 <aside class="sidebar" aria-label="Zijbalk">
   {sidebarPromos.map((promo) => (
-    <section class="widget">
+    <section class="widget widget--promo">
+      {promo.image && (
+        <a
+          class="widget__media"
+          href={promo.href}
+          tabindex="-1"
+          aria-hidden="true"
+          rel={external(promo.href) ? "nofollow sponsored noopener" : undefined}
+        >
+          <img src={promo.image} alt="" loading="lazy" decoding="async" />
+        </a>
+      )}
       <h2 class="widget__title">{promo.title}</h2>
       <div class="widget__body">
-        {promo.image && (
-          <a href={promo.href} rel={external(promo.href) ? "nofollow sponsored noopener" : undefined}>
-            <img src={promo.image} alt={promo.title} loading="lazy" decoding="async" />
-          </a>
-        )}
         {promo.text && <p>{promo.text}</p>}
         <a
           class="button"
@@ -30,7 +36,7 @@ const external = (href: string) => Boolean(affiliateRedirects[href]);
   ))}
 
   <section class="widget">
-    <h2 class="widget__title">Recente Artikels</h2>
+    <h2 class="widget__title">Recente artikelen</h2>
     <div class="widget__body">
       <ul>
         {recent.map((post) => (
