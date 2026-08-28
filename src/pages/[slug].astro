@@ -1,0 +1,78 @@
+---
+import { getEntry } from "astro:content";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Sidebar from "../components/Sidebar.astro";
+import { allPosts, formatDate, isoDate } from "../lib/index";
+import { site } from "../data/site";
+
+export function getStaticPaths() {
+  // home, blog en sitemap hebben een eigen sjabloon; de overige
+  // WordPress-pagina's lopen hier mee op dezelfde /{slug}/-vorm als de berichten.
+  const pageSlugs = ["over", "trainingen", "privacybeleid"];
+
+  // De paden komen uit de compacte index, niet uit getCollection: die zou
+  // 160 MB aan artikeltekst in het geheugen trekken voordat er iets gebouwd is.
+  return [
+    ...allPosts.map((p) => ({
+      params: { slug: p.slug },
+      props: { kind: "post" as const },
+    })),
+    ...pageSlugs.map((slug) => ({
+      params: { slug },
+      props: { kind: "page" as const },
+    })),
+  ];
+}
+
+const { kind } = Astro.props;
+const { slug } = Astro.params;
+
+const entry = await getEntry(kind === "post" ? "posts" : "pages", slug!);
+if (!entry) throw new Error(`Geen inhoud gevonden voor /${slug}/`);
+const data = entry.data;
+
+const categories = kind === "post" ? (data as any).categories ?? [] : [];
+
+const schema =
+  kind === "post"
+    ? {
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        headline: data.title,
+        datePublished: isoDate(data.date),
+        dateModified: isoDate(data.modified || data.date),
+        author: { "@type": "Organization", name: site.name },
+        publisher: { "@type": "Organization", name: site.name },
+        mainEntityOfPage: `${site.domain}/${slug}/`,
+        inLanguage: "nl-NL",
+      }
+    : null;
+---
+
+<BaseLayout
+  title={data.seoTitle || data.title + site.titleSuffix}
+  description={data.seoDescription}
+  canonical={data.canonical || `${site.domain}/${slug}/`}
+  image={data.ogImage}
+  type={kind === "post" ? "article" : "website"}
+>
+  {schema && (
+    <script slot="head" is:inline type="application/ld+json" set:html={JSON.stringify(schema)} />
+  )}
+
+  <div class="wrap layout">
+    <article>
+      <h1>{data.title}</h1>
+      {kind === "post" && (
+        <p class="entry__meta">
+          <time datetime={isoDate(data.date)}>{formatDate(data.date)}</time>
+          {categories.map((c: { slug: string; name: string }) => (
+            <a href={`/info/${c.slug}/`}>{c.name}</a>
+          ))}
+        </p>
+      )}
+      <div class="entry__content" set:html={data.content} />
+    </article>
+    <Sidebar />
+  </div>
+</BaseLayout>

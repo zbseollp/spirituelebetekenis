@@ -1,0 +1,26 @@
+---
+import { getEntry } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Sidebar from "../../components/Sidebar.astro";
+import ArchiveList from "../../components/ArchiveList.astro";
+import Pagination from "../../components/Pagination.astro";
+import { allPosts } from "../../lib/index";
+import { site, POSTS_PER_PAGE as PER } from "../../data/site";
+
+const page = await getEntry("pages", "blog");
+const total = Math.ceil(allPosts.length / PER);
+---
+<BaseLayout
+  title={page?.data.seoTitle || "Blog" + site.titleSuffix}
+  description={page?.data.seoDescription || site.description}
+  canonical={site.domain + "/blog/"}
+>
+  <div class="wrap layout">
+    <div>
+      <h1>{page?.data.title || "Blog"}</h1>
+      <ArchiveList posts={allPosts.slice(0, PER)} />
+      <Pagination current={1} total={total} href={(n) => (n === 1 ? "/blog/" : `/blog/page/${n}/`)} />
+    </div>
+    <Sidebar />
+  </div>
+</BaseLayout>

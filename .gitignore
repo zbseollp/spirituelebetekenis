@@ -1,0 +1,17 @@
+node_modules/
+dist/
+.astro/
+.wrangler/
+.env
+.DS_Store
+
+# Ruwe REST-dumps en de HTML-spiegel zijn bronmateriaal voor de migratie,
+# geen sitecode. src/content/ wordt hieruit gegenereerd met `npm run content`.
+migration/source/posts.json
+migration/source/meta.json
+migration/source/_*
+migration/mirror/
+
+# Twee PHP-payloads uit de mediabibliotheek van de gehackte WordPress-site,
+# bewaard als bewijsmateriaal. Horen niet in de repo en niet in public/.
+migration/source/_webshell-*.txt

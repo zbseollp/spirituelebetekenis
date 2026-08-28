@@ -1,0 +1,32 @@
+---
+import type { IndexEntry } from "../lib/index";
+import { formatDate, isoDate, categoryBySlug } from "../lib/index";
+
+interface Props { posts: IndexEntry[] }
+const { posts } = Astro.props;
+---
+<div class="archive">
+  {posts.map((post) => (
+    <article class="archive__item">
+      <h2><a href={`/${post.slug}/`}>{post.title}</a></h2>
+      <p class="archive__meta">
+        <time datetime={isoDate(post.date)}>{formatDate(post.date)}</time>
+        {post.categories.length > 0 && (
+          <span>
+            {" · "}
+            {post.categories.map((slug, i) => {
+              const c = categoryBySlug(slug);
+              return c ? (
+                <>
+                  {i > 0 && ", "}
+                  <a href={`/info/${c.slug}/`}>{c.name}</a>
+                </>
+              ) : null;
+            })}
+          </span>
+        )}
+      </p>
+      {post.excerpt && <p>{post.excerpt}</p>}
+    </article>
+  ))}
+</div>

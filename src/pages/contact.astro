@@ -1,0 +1,111 @@
+---
+import { getEntry } from "astro:content";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Sidebar from "../components/Sidebar.astro";
+import { site, contact } from "../data/site";
+
+const page = await getEntry("pages", "contact");
+
+// De oude site had hier een WordPress-formulier. Zonder de mailkoppeling
+// daarvan zou een formulier hier stilletjes niets doen; vul contact.web3formsKey
+// in src/data/site.ts en het formulier verstuurt weer echt.
+const hasForm = Boolean(contact.web3formsKey);
+---
+<BaseLayout
+  title={page?.data.seoTitle || "Contact" + site.titleSuffix}
+  description={page?.data.seoDescription}
+  canonical={site.domain + "/contact/"}
+>
+  <div class="wrap layout">
+    <div>
+      <h1>Contact</h1>
+      <p>
+        Heb je een vraag? Stuur dan een bericht via het contactformulier of via
+        onderstaande gegevens.
+      </p>
+
+      {hasForm ? (
+        <form class="contact-form" id="contactform" novalidate>
+          <input type="hidden" name="access_key" value={contact.web3formsKey} />
+          <input type="hidden" name="subject" value={`Bericht via ${site.name}`} />
+          <input type="hidden" name="from_name" value={site.name} />
+          <div class="contact-form__hp" aria-hidden="true">
+            <label>
+              Laat dit veld leeg als je een mens bent
+              <input type="checkbox" name="botcheck" tabindex="-1" autocomplete="off" />
+            </label>
+          </div>
+
+          <p class="field">
+            <label for="cf-naam">Naam</label>
+            <input id="cf-naam" name="Naam" type="text" autocomplete="name" required maxlength="120" />
+          </p>
+          <p class="field">
+            <label for="cf-email">E-mail adres</label>
+            <input id="cf-email" name="email" type="email" autocomplete="email" required maxlength="180" />
+          </p>
+          <p class="field">
+            <label for="cf-bericht">Bericht</label>
+            <textarea id="cf-bericht" name="Bericht" rows="6" required maxlength="4000"></textarea>
+          </p>
+          <p><button class="button" type="submit">Versturen</button></p>
+          <p class="contact-form__status" role="status" aria-live="polite"></p>
+        </form>
+      ) : (
+        <p>
+          Mail ons op <a href={`mailto:${contact.email}`}>{contact.email}</a>.
+        </p>
+      )}
+
+      <h2 style="margin-top:2rem">Gegevens</h2>
+      <p>
+        {contact.address.map((line) => (<>{line}<br /></>))}
+        <a href={`mailto:${contact.email}`}>{contact.email}</a>
+      </p>
+    </div>
+    <Sidebar />
+  </div>
+
+  <style>
+    .contact-form { display: grid; gap: 0.25rem; max-width: 620px; }
+    .contact-form .field { display: grid; gap: 0.35rem; margin: 0 0 1rem; }
+    .contact-form label { font-size: 0.9375rem; font-weight: 500; color: var(--heading); }
+    .contact-form input, .contact-form textarea {
+      font: inherit; padding: 0.6rem 0.75rem;
+      border: 1px solid var(--line); border-radius: 3px; background: #fff;
+    }
+    .contact-form input:focus-visible, .contact-form textarea:focus-visible {
+      outline: 2px solid var(--accent); outline-offset: 1px;
+    }
+    .contact-form button { border: 0; cursor: pointer; font: inherit; }
+    .contact-form__hp { position: absolute; left: -9999px; }
+    .contact-form__status:empty { display: none; }
+  </style>
+
+  {hasForm && (
+    <script>
+      const form = document.getElementById("contactform");
+      const status = form?.querySelector(".contact-form__status");
+      form?.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        if (!form.reportValidity()) return;
+        status.textContent = "Versturen…";
+        try {
+          const res = await fetch("https://api.web3forms.com/submit", {
+            method: "POST",
+            headers: { Accept: "application/json" },
+            body: new FormData(form),
+          });
+          if (res.ok) {
+            form.reset();
+            status.textContent = "Bedankt, je bericht is verstuurd.";
+          } else {
+            status.textContent = "Verzenden lukte niet. Mail ons gerust rechtstreeks.";
+          }
+        } catch {
+          status.textContent = "Verzenden lukte niet. Mail ons gerust rechtstreeks.";
+        }
+      });
+    </script>
+  )}
+</BaseLayout>

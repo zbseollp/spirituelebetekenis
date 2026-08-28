@@ -1,0 +1,39 @@
+---
+import { getEntry } from "astro:content";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Sidebar from "../components/Sidebar.astro";
+import ArchiveList from "../components/ArchiveList.astro";
+import { allPosts, categories, postsInCategory } from "../lib/index";
+import { site } from "../data/site";
+
+const home = await getEntry("pages", "home");
+const recent = allPosts.slice(0, 10);
+---
+
+<BaseLayout
+  title={home?.data.seoTitle || site.name}
+  description={home?.data.seoDescription || site.description}
+  canonical={site.domain + "/"}
+>
+  <div class="wrap layout">
+    <div>
+      <h1>{home?.data.title || site.name}</h1>
+      {home?.data.content && <div class="entry__content" set:html={home.data.content} />}
+
+      <h2>Onderwerpen</h2>
+      <div class="cat-grid">
+        {categories.map((c) => (
+          <a class="cat-card" href={`/info/${c.slug}/`}>
+            <h3>{c.name}</h3>
+            <p>{postsInCategory(c.slug).length} artikelen</p>
+          </a>
+        ))}
+      </div>
+
+      <h2 style="margin-top:2.5rem">Recente artikelen</h2>
+      <ArchiveList posts={recent} />
+      <p style="margin-top:1.5rem"><a class="button" href="/blog/">Alle berichten bekijken</a></p>
+    </div>
+    <Sidebar />
+  </div>
+</BaseLayout>

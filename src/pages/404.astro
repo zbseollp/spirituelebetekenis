@@ -1,0 +1,20 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Sidebar from "../components/Sidebar.astro";
+import ArchiveList from "../components/ArchiveList.astro";
+import { allPosts } from "../lib/index";
+import { site } from "../data/site";
+---
+<BaseLayout title={"Pagina niet gevonden" + site.titleSuffix} noindex>
+  <div class="wrap layout">
+    <div>
+      <h1>Pagina niet gevonden</h1>
+      <p>Deze pagina bestaat niet (meer). Zoek verder via
+         <a href="/blog/">alle berichten</a> of ga terug naar de
+         <a href="/">homepage</a>.</p>
+      <h2 style="margin-top:2rem">Recente artikelen</h2>
+      <ArchiveList posts={allPosts.slice(0, 8)} />
+    </div>
+    <Sidebar />
+  </div>
+</BaseLayout>

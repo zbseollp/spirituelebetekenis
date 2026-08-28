@@ -1,0 +1,21 @@
+---
+import { getEntry } from "astro:content";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Sidebar from "../components/Sidebar.astro";
+import { site } from "../data/site";
+
+// De oude /sitemap/ was een gewone WordPress-pagina met een handmatige lijst
+// van pagina's en categorieën - niet van alle 6792 berichten. Die inhoud staat
+// in de export, dus die renderen we hier gewoon.
+const page = await getEntry("pages", "sitemap");
+---
+<BaseLayout
+  title={page?.data.seoTitle || "Sitemap" + site.titleSuffix}
+  description={page?.data.seoDescription}
+  canonical={site.domain + "/sitemap/"}
+>
+  <div class="wrap layout">
+    <div class="entry__content" set:html={page?.data.content} />
+    <Sidebar />
+  </div>
+</BaseLayout>

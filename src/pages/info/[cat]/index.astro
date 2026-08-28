@@ -1,0 +1,36 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import Sidebar from "../../../components/Sidebar.astro";
+import ArchiveList from "../../../components/ArchiveList.astro";
+import Pagination from "../../../components/Pagination.astro";
+import { categories, postsInCategory } from "../../../lib/index";
+import { site, POSTS_PER_PAGE as PER } from "../../../data/site";
+
+// WordPress serveerde de categorieën onder /info/, niet onder /category/.
+export function getStaticPaths() {
+  return categories.map((c) => ({ params: { cat: c.slug }, props: { category: c } }));
+}
+
+const { category } = Astro.props;
+const all = postsInCategory(category.slug);
+const total = Math.max(1, Math.ceil(all.length / PER));
+---
+<BaseLayout
+  title={`${category.name} Archieven${site.titleSuffix}`}
+  description={`Alle artikelen over ${category.name} op ${site.name}.`}
+  canonical={`${site.domain}/info/${category.slug}/`}
+>
+  <div class="wrap layout">
+    <div>
+      <h1>{category.name}</h1>
+      <p class="archive__meta">{all.length} artikelen</p>
+      <ArchiveList posts={all.slice(0, PER)} />
+      <Pagination
+        current={1}
+        total={total}
+        href={(n) => (n === 1 ? `/info/${category.slug}/` : `/info/${category.slug}/page/${n}/`)}
+      />
+    </div>
+    <Sidebar />
+  </div>
+</BaseLayout>
