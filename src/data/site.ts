@@ -93,10 +93,10 @@ export const sidebarPromos = [
 export const contact = {
   email: "info@spirituelebetekenis.com",
   address: ["Tinhoutstraat 145", "8730 Oedelem"],
-  // Vul hier de Web3Forms access key in en het contactformulier verstuurt weer
-  // echt; zolang die leeg is toont /contact/ het mailadres in plaats van een
-  // formulier dat stilletjes niets doet.
-  web3formsKey: "",
+  // Het contactformulier loopt via Web3Forms, met dezelfde access key als de
+  // andere sites; die bepaalt naar welk mailadres het bericht gaat. Maak hem
+  // leeg en /contact/ toont het mailadres in plaats van een formulier.
+  web3formsKey: "281f477d-7744-407d-9b6a-9b8d9c6abe3c",
 };
 
 export const POSTS_PER_PAGE = 40; // zoals de oude site
